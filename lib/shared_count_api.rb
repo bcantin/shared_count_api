@@ -113,20 +113,20 @@ module SharedCountApi
 
           # res = Net::HTTP.get_response(uri)
 
-          res = open(uri, 'r', read_timeout: 60) do |http|
-            http.read
-          end
+          res = open(uri, 'r', read_timeout: 60).read
 
-          case res
-          when Net::HTTPOK then
-            JSON.parse(res.body)
-          # when OpenURI::HTTPError then
+          JSON.parse( res )
+
+          # case res
+          # when Net::HTTPOK then
+          #   JSON.parse(res)
+          # # when OpenURI::HTTPError then
+          # #   json = JSON.parse(res.body)
+          # #   raise Error.new(json["Type"], json["Error"])
+          # else
           #   json = JSON.parse(res.body)
           #   raise Error.new(json["Type"], json["Error"])
-          else
-            json = JSON.parse(res.body)
-            raise Error.new(json["Type"], json["Error"])
-          end
+          # end
         rescue URI::InvalidURIError
           raise INVALID_URL
         end
