@@ -1,5 +1,6 @@
 require_relative "shared_count_api/version"
 require "net/http"
+require 'open-uri'
 require "json"
 require "ostruct"
 
@@ -110,14 +111,21 @@ module SharedCountApi
             URI("#{@endpoint}?url=#{@url}")
           end
 
-          res = Net::HTTP.get_response(uri)
+          # res = Net::HTTP.get_response(uri)
+
+          res = open(uri, 'r', read_timeout: 60) do |http|
+            http.read
+          end
 
           case res
-          when Net::HTTPUnauthorized, Net::HTTPBadRequest then
+          when Net::HTTPOK then
+            JSON.parse(res.body)
+          # when OpenURI::HTTPError then
+          #   json = JSON.parse(res.body)
+          #   raise Error.new(json["Type"], json["Error"])
+          else
             json = JSON.parse(res.body)
             raise Error.new(json["Type"], json["Error"])
-          when Net::HTTPSuccess then
-            JSON.parse(res.body)
           end
         rescue URI::InvalidURIError
           raise INVALID_URL
